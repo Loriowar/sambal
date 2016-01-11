@@ -13,7 +13,8 @@ module Sambal
       begin
         options = {domain: 'WORKGROUP', host: '127.0.0.1', share: '', user: 'guest', password: '--no-pass', port: 445, timeout: 10, columns: 80}.merge(options)
         @timeout = options[:timeout].to_i
-        @o, @i, @pid = PTY.spawn("COLUMNS=#{options[:columns]} smbclient \"//#{options[:host]}/#{options[:share]}\" '#{options[:password]}' -W \"#{options[:domain]}\" -U \"#{options[:user]}\" -p #{options[:port]}")
+        custom_env_lang = options[:lang] ? "LANG=#{options[:lang]}" : ''
+        @o, @i, @pid = PTY.spawn("COLUMNS=#{options[:columns]} #{custom_env_lang} smbclient \"//#{options[:host]}/#{options[:share]}\" '#{options[:password]}' -W \"#{options[:domain]}\" -U \"#{options[:user]}\" -p #{options[:port]}")
         res = @o.expect(/(.*\n)?smb:.*\\>/, @timeout)[0] rescue nil
         @connected = case res
         when nil
